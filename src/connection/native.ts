@@ -35,7 +35,7 @@ function getNativeModule() {
   if (mod) return mod;
 
   throw new Error(
-    `[SigaPrinter] Native module "${MODULE_NAME}" not found. Did you run `pod install` (iOS) or rebuild the Android project? See the README for installation instructions.` +
+    `[SigaPrinter] Native module "${MODULE_NAME}" not found. ` +
     'Did you run `pod install` (iOS) or rebuild the Android project? ' +
     'See the README for installation instructions.',
   );
