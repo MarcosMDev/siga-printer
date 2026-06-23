@@ -363,6 +363,84 @@ console.log(all);
 
 ---
 
+### Gerenciamento de conexão
+
+O `printerManager` é um **singleton global** que mantém o estado da conexão entre componentes. Ideal para apps que precisam conectar uma vez e imprimir de qualquer tela.
+
+```typescript
+import { printerManager, useConnectionManager, PrinterSelector } from 'siga-printer';
+
+// ── Imperativo (fora de componentes) ──────────────────────────
+
+// Conectar a partir de um dispositivo descoberto
+await printerManager.connectDevice(device); // device vem do discoverAll()
+
+// Ou via config direta
+await printerManager.connect({ type: 'usb' });
+
+// Desconectar
+await printerManager.disconnect();
+
+// Reconectar com o último config
+await printerManager.reconnect();
+
+// Ouvir mudanças de estado
+const unsub = printerManager.subscribe(state => {
+  console.log(state.status);        // 'idle' | 'connecting' | 'connected' | 'reconnecting' | 'error' | 'disconnected'
+  console.log(state.connectedDevice); // DiscoveredDevice | null
+});
+unsub(); // parar de ouvir
+
+// Configurar auto-reconnect
+printerManager.configure({
+  autoReconnect: true,
+  maxReconnectAttempts: 3,
+  reconnectDelay: 1000, // ms, dobra a cada tentativa
+});
+```
+
+```typescript
+// ── Hook reativo (dentro de componentes) ──────────────────────
+
+import { useConnectionManager } from 'siga-printer';
+
+function MyScreen() {
+  const {
+    status,           // ConnectionManagerStatus
+    connectedDevice,  // DiscoveredDevice | null
+    isConnected,      // boolean
+    error,
+    connectDevice,
+    connect,
+    disconnect,
+    reconnect,
+  } = useConnectionManager();
+
+  return <Text>{isConnected ? `Conectado: ${connectedDevice?.name}` : status}</Text>;
+}
+```
+
+```tsx
+// ── Componente pronto (UI completa) ───────────────────────────
+
+import { PrinterSelector } from 'siga-printer';
+
+function PrinterSetupScreen() {
+  return (
+    <PrinterSelector
+      onConnect={(device) => console.log('Conectado a', device.name)}
+      onError={(msg) => console.error(msg)}
+      scanType="all"       // 'all' | 'usb' | 'bluetooth' | 'tcp'
+      showStatus={true}    // banner de status no topo
+    />
+  );
+}
+```
+
+O `PrinterSelector` inclui: busca por tipo, lista de dispositivos com ícone, botão conectar/desconectar por item, e banner de status em tempo real.
+
+---
+
 ### Perfis de impressora
 
 ```typescript
