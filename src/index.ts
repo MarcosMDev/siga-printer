@@ -94,3 +94,21 @@ export type {
   PreviewElement,
   PreviewElementType,
 } from './preview';
+
+// ── Template Designer ─────────────────────────────────────────
+export {
+  TemplateDesigner,
+  BOLETO_LANDSCAPE_STARTER,
+  generateTypeScriptCode,
+  createDefaultBlock,
+  BLOCK_META,
+} from './template-designer';
+
+export type {
+  DesignerBlock,
+  DesignerBlockType,
+  TemplateDefinition,
+  TemplateVariable,
+  BlockGeometry,
+  BlockData,
+} from './template-designer';
