@@ -391,7 +391,7 @@ function VarBindingField({
             styles.varInput,
             mono && styles.inputMono,
             multiline && styles.inputMulti,
-            variable && styles.inputBound,
+            !!variable && styles.inputBound,
           ]}
           value={variable ? `{${variable}}` : value}
           onChangeText={onChange}
@@ -401,7 +401,7 @@ function VarBindingField({
         />
         {varNames.length > 0 && (
           <TouchableOpacity
-            style={[styles.varBtn, variable && styles.varBtnActive]}
+            style={[styles.varBtn, !!variable && styles.varBtnActive]}
             onPress={() => setShowVarPicker(!showVarPicker)}
           >
             <Text style={styles.varBtnText}>{variable ? '🔗' : '⊕'}</Text>

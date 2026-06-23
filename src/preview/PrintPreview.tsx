@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import {
   View,
   Text,
@@ -23,7 +23,6 @@ import type {
   PreviewTableRow,
 } from './PreviewRenderer';
 import type { PrinterProfile, PrintOrientation } from '../types';
-import { DEFAULT_PROFILE } from '../utils/profiles';
 
 // ─────────────────────────────────────────────────────────────
 //  PrintPreview component
@@ -74,7 +73,6 @@ export function PrintPreview({
   showRuler   = true,
   showMetrics = true,
   highlightOverflow = true,
-  showCutMark = true,
   style,
 }: PrintPreviewProps) {
   const { width: screenWidth } = useWindowDimensions();
@@ -135,7 +133,6 @@ export function PrintPreview({
                 paperPx={paperPx}
                 mmToPx={mmToPx}
                 highlightOverflow={highlightOverflow}
-                profile={profile}
               />
             ))}
 
@@ -254,13 +251,12 @@ function Ruler({ widthPx, mmToPx }: { widthPx: number; mmToPx: number }) {
 // ─────────────────────────────────────────────────────────────
 
 function ElementRenderer({
-  element, paperPx, mmToPx, highlightOverflow, profile,
+  element, paperPx, mmToPx, highlightOverflow,
 }: {
   element:          PreviewElement;
   paperPx:          number;
   mmToPx:           number;
   highlightOverflow:boolean;
-  profile:          PrinterProfile;
 }) {
   const overflowStyle = highlightOverflow && element.overflow
     ? styles.overflowHighlight
@@ -488,10 +484,8 @@ function ImageElement({
 
 function DividerElement({ el }: { el: PreviewDivider }) {
   const style = el.options?.style ?? 'line';
-  const char  = el.options?.char;
 
   let lineStyle: any = styles.dividerLine;
-  let content = '';
 
   switch (style) {
     case 'double':
@@ -549,7 +543,6 @@ function CutElement({ el, paperPx }: { el: PreviewCut; paperPx: number }) {
 }
 
 function SectionElement({ el }: { el: PreviewSection }) {
-  const char = el.options.dividerChar ?? '─';
   const title = el.options.uppercase
     ? el.options.title.toUpperCase()
     : el.options.title;

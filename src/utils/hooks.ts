@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { ThermalPrinter, ConnectedThermalPrinter } from '../builder/ThermalPrinter';
 import { PrinterDiscovery } from '../connection/discovery';
+import { printerManager } from '../connection/ConnectionManager';
 import type {
   ConnectionConfig,
   ConnectionStatus,
@@ -8,6 +9,10 @@ import type {
   PrintResult,
   ThermalPrinterOptions,
 } from '../types';
+import type {
+  ConnectionManagerState,
+  ConnectionManagerOptions,
+} from '../connection/ConnectionManager';
 
 // ─────────────────────────────────────────────────────────────
 //  usePrinter
@@ -184,5 +189,54 @@ export function useDiscovery(): UseDiscoveryReturn {
     scanBT:  ()  => runScan(() => discovery.current.discoverBluetooth()),
     scanTCP: ()  => runScan(() => discovery.current.discoverNetwork()),
     clear:   ()  => setDevices([]),
+  };
+}
+
+// ─────────────────────────────────────────────────────────────
+//  useConnectionManager
+//
+//  Reactive access to the global PrinterConnectionManager
+//  singleton. State persists across component mount/unmount.
+//
+//  Usage:
+//    const { status, connectedDevice, connectDevice, disconnect } =
+//      useConnectionManager();
+// ─────────────────────────────────────────────────────────────
+
+export interface UseConnectionManagerReturn extends ConnectionManagerState {
+  isConnected: boolean;
+  connectDevice: (device: DiscoveredDevice) => Promise<void>;
+  connect: (config: ConnectionConfig) => Promise<void>;
+  disconnect: () => Promise<void>;
+  reconnect: () => Promise<void>;
+  configure: (options: ConnectionManagerOptions) => void;
+}
+
+export function useConnectionManager(): UseConnectionManagerReturn {
+  const [state, setState] = useState<ConnectionManagerState>(
+    printerManager.getState,
+  );
+
+  useEffect(() => {
+    return printerManager.subscribe(setState);
+  }, []);
+
+  return {
+    ...state,
+    isConnected: printerManager.isConnected,
+    connectDevice: useCallback(
+      (device: DiscoveredDevice) => printerManager.connectDevice(device),
+      [],
+    ),
+    connect: useCallback(
+      (config: ConnectionConfig) => printerManager.connect(config),
+      [],
+    ),
+    disconnect: useCallback(() => printerManager.disconnect(), []),
+    reconnect: useCallback(() => printerManager.reconnect(), []),
+    configure: useCallback(
+      (options: ConnectionManagerOptions) => printerManager.configure(options),
+      [],
+    ),
   };
 }

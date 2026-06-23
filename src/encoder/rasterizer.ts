@@ -1,4 +1,3 @@
-import { Platform } from 'react-native';
 import type { PrinterProfile } from '../types';
 import type { ImageDitherMode } from '../types';
 
@@ -298,7 +297,6 @@ export class ImageRasterizer {
     // ESC/POS expects pixels packed 8-per-byte, MSB first.
     // Width must be padded to a multiple of 8.
     const widthBytes = Math.ceil(w / 8);
-    const paddedW    = widthBytes * 8;
     const pixels     = new Uint8Array(widthBytes * h);
 
     for (let y = 0; y < h; y++) {

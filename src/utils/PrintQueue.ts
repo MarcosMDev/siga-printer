@@ -1,4 +1,4 @@
-import type { PrintResult, PrintJob } from '../types';
+import type { PrintResult } from '../types';
 import type { ConnectedThermalPrinter } from '../builder/ThermalPrinter';
 
 // ─────────────────────────────────────────────────────────────

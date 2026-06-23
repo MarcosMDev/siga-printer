@@ -1,11 +1,11 @@
-import React, { useRef, useCallback, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   View, Text, ScrollView, PanResponder,
   StyleSheet, TouchableOpacity, Platform,
 } from 'react-native';
 
 import type { DesignerBlock, DesignerBlockType, BlockGeometry } from './types';
-import { BLOCK_META, estimateBlockHeightMm, mmToPx, pxToMm, snapToGrid } from './types';
+import { BLOCK_META, mmToPx, pxToMm, snapToGrid } from './types';
 import type { PrintOrientation } from '../types';
 
 // ─────────────────────────────────────────────────────────────
@@ -40,7 +40,7 @@ interface PaperCanvasProps {
 export function PaperCanvas({
   blocks, selectedId, paperWidth, canvasHeightMm,
   mmScale, orientation, showGrid, snapEnabled, gridMm,
-  onSelectBlock, onUpdateGeometry, onAddBlock,
+  onSelectBlock, onUpdateGeometry,
 }: PaperCanvasProps) {
   const canvasPx = {
     w: mmToPx(paperWidth, mmScale),

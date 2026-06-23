@@ -10,7 +10,6 @@ import type {
   SectionOptions,
   PrinterProfile,
   CharsetEncoding,
-  PrintOrientation,
   TextAlign,
 } from '../types';
 
@@ -27,16 +26,13 @@ import { DEFAULT_PROFILE } from '../utils/profiles';
 export class ESCPOSEncoder {
   private profile: PrinterProfile;
   private defaultCharset: CharsetEncoding;
-  private orientation: PrintOrientation;
 
   constructor(
     profile: PrinterProfile = DEFAULT_PROFILE,
     charset: CharsetEncoding = 'CP860',
-    orientation: PrintOrientation = 'portrait',
   ) {
-    this.profile     = profile;
+    this.profile        = profile;
     this.defaultCharset = charset;
-    this.orientation = orientation;
   }
 
   // ── Init ────────────────────────────────────────────────────
@@ -276,6 +272,25 @@ export class ESCPOSEncoder {
     bytes.push(CMD.LF);
     bytes.push(...CMD.ALIGN_LEFT);
 
+    return bytes;
+  }
+
+  async imageLandscape(options: ImageOptions): Promise<number[]> {
+    const rasterizer = new ImageRasterizer(this.profile);
+    const { widthBytes, heightDots, pixels } = await rasterizer.renderLandscape(
+      options.source,
+      {
+        targetWidth:  options.width,
+        targetHeight: options.height,
+        dither:       options.dither    ?? 'floyd-steinberg',
+        threshold:    options.threshold ?? 0.5,
+      },
+    );
+    const bytes: number[] = [];
+    bytes.push(...this._alignCmd(options.align ?? 'center'));
+    bytes.push(...CMD.rasterImage(widthBytes, heightDots, 0, pixels));
+    bytes.push(CMD.LF);
+    bytes.push(...CMD.ALIGN_LEFT);
     return bytes;
   }
 

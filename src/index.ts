@@ -9,6 +9,14 @@ export { ThermalPrinter, ConnectedThermalPrinter } from './builder/ThermalPrinte
 // Printer discovery
 export { PrinterDiscovery } from './connection/discovery';
 
+// Connection manager (singleton + component)
+export {
+  printerManager,
+  PrinterConnectionManager,
+  deviceToConfig,
+} from './connection/ConnectionManager';
+export { PrinterSelector } from './connection/PrinterSelector';
+
 // Templates
 export { BoletoTemplate }       from './templates/BoletoTemplate';
 export { ReceiptTemplate }      from './templates/ReceiptTemplate';
@@ -18,7 +26,7 @@ export { ShippingLabelTemplate } from './templates/ShippingLabelTemplate';
 export { PrintQueue }           from './utils/PrintQueue';
 
 // React hooks
-export { usePrinter, useDiscovery } from './utils/hooks';
+export { usePrinter, useDiscovery, useConnectionManager } from './utils/hooks';
 
 // Printer profiles
 export { PRINTER_PROFILES, DEFAULT_PROFILE } from './utils/profiles';
@@ -78,7 +86,21 @@ export type { ShippingLabelData } from './templates/ShippingLabelTemplate';
 export type { QueuedJob, PrintQueueOptions } from './utils/PrintQueue';
 
 // Hook types
-export type { UsePrinterReturn, UseDiscoveryReturn } from './utils/hooks';
+export type {
+  UsePrinterReturn,
+  UseDiscoveryReturn,
+  UseConnectionManagerReturn,
+} from './utils/hooks';
+
+// Connection manager types
+export type {
+  ConnectionManagerState,
+  ConnectionManagerStatus,
+  ConnectionManagerOptions,
+} from './connection/ConnectionManager';
+
+// PrinterSelector props
+export type { PrinterSelectorProps } from './connection/PrinterSelector';
 
 // ── Preview & Config ──────────────────────────────────────────
 export {

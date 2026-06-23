@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback } from 'react';
 import {
   View,
   Text,
@@ -12,14 +12,12 @@ import {
   Modal,
   Alert,
   KeyboardAvoidingView,
-  Animated,
 } from 'react-native';
 
 import { PrintPreview }       from './PrintPreview';
 import { PrintPreviewBuilder } from './PrintPreviewBuilder';
 import { PRINTER_PROFILES }   from '../utils/profiles';
 import type {
-  PrinterProfile,
   PrinterModel,
   PrintOrientation,
   TextAlign,
@@ -247,10 +245,9 @@ interface PrintConfig {
 
 export function PrintConfigScreen({
   onPrint,
-  onSave,
   initialBlocks,
 }: PrintConfigScreenProps) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isWide = width > 700; // tablet or landscape phone
 
   const [blocks,       setBlocks      ] = useState<Block[]>(initialBlocks ?? DEFAULT_BLOCKS);

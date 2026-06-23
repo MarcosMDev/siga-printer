@@ -12,8 +12,6 @@ import type {
   SectionOptions,
   PrintResult,
   PrintOrientation,
-  PrinterProfile,
-  CharsetEncoding,
 } from '../types';
 
 import { ESCPOSEncoder } from '../encoder/encoder';
@@ -47,14 +45,13 @@ export class ThermalPrinter {
   private steps:       Step[];
   private orientation: PrintOrientation;
 
-  private constructor(options: ThermalPrinterOptions = {}) {
+  protected constructor(options: ThermalPrinterOptions = {}) {
     this.options     = options;
     this.orientation = options.orientation ?? 'portrait';
 
     this.encoder = new ESCPOSEncoder(
-      options.profile  ?? DEFAULT_PROFILE,
-      options.charset  ?? 'CP860',
-      this.orientation,
+      options.profile ?? DEFAULT_PROFILE,
+      options.charset ?? 'CP860',
     );
 
     this.steps = [];
@@ -207,15 +204,7 @@ export class ThermalPrinter {
   image(options: ImageOptions): this {
     this.steps.push(async () => {
       if (this.orientation === 'landscape') {
-        return this.encoder['rasterizer']?.renderLandscape(
-          options.source,
-          {
-            targetWidth:  options.width,
-            targetHeight: options.height,
-            dither:       options.dither       ?? 'floyd-steinberg',
-            threshold:    options.threshold    ?? 0.5,
-          },
-        ).then(() => this.encoder.image(options)) ?? this.encoder.image(options);
+        return this.encoder.imageLandscape(options);
       }
       return this.encoder.image(options);
     });

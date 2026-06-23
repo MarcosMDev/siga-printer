@@ -3,10 +3,8 @@ export { PrintPreviewBuilder } from './PrintPreviewBuilder';
 export { PrintConfigScreen }   from './PrintConfigScreen';
 export { PreviewRenderer }     from './PreviewRenderer';
 
-export type {
-  PrintPreviewProps,
-  PrintConfigScreenProps,
-} from './PrintPreview';
+export type { PrintPreviewProps } from './PrintPreview';
+export type { PrintConfigScreenProps } from './PrintConfigScreen';
 
 export type {
   PreviewElement,

@@ -1,19 +1,16 @@
 import React, {
-  useState, useRef, useCallback, useMemo,
+  useState, useCallback, useMemo,
 } from 'react';
 import {
   View, Text, ScrollView, TouchableOpacity,
-  PanResponder, Animated, StyleSheet,
-  useWindowDimensions, Modal, Alert,
+  StyleSheet, useWindowDimensions, Modal, Alert,
   Platform, Clipboard,
 } from 'react-native';
 
 import {
   BLOCK_META,
   createDefaultBlock,
-  estimateBlockHeightMm,
   generateTypeScriptCode,
-  mmToPx, pxToMm, snapToGrid,
 } from './types';
 import type {
   DesignerBlock,
@@ -62,7 +59,7 @@ export function TemplateDesigner({
   onExport,
   onSave,
 }: TemplateDesignerProps) {
-  const { width, height } = useWindowDimensions();
+  const { width } = useWindowDimensions();
   const isWide = width > 700;
 
   // ── Template state ─────────────────────────────────────────
