@@ -223,6 +223,22 @@ export function HomeScreen({ navigation }: Props) {
       )}
 
       {/* Navigation */}
+      <Text style={styles.sectionTitle}>Conexão</Text>
+      <TouchableOpacity
+        style={styles.navItem}
+        onPress={() => navigation.navigate('ConnectionManager')}
+      >
+        <Text style={styles.navItemText}>🔗 Connection Manager</Text>
+        <Text style={styles.navChevron}>›</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.navItem}
+        onPress={() => navigation.navigate('Discovery')}
+      >
+        <Text style={styles.navItemText}>🔍 Descobrir impressoras</Text>
+        <Text style={styles.navChevron}>›</Text>
+      </TouchableOpacity>
+
       {connected && (
         <>
           <Text style={styles.sectionTitle}>Imprimir</Text>
