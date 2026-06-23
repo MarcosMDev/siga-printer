@@ -3,8 +3,8 @@ import {
   View, Text, TouchableOpacity, ScrollView,
   StyleSheet, Alert, ActivityIndicator,
 } from 'react-native';
-import { ReceiptTemplate } from 'react-native-thermal-printer';
-import type { ReceiptData } from 'react-native-thermal-printer';
+import { ReceiptTemplate } from 'siga-printer';
+import type { ReceiptData } from 'siga-printer';
 import { globalPrinter, globalOrientation } from './HomeScreen';
 
 // Sample receipt data

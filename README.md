@@ -1,4 +1,4 @@
-# react-native-thermal-printer
+# siga-printer
 
 Biblioteca completa para impressão em impressoras térmicas ESC/POS via React Native.
 Suporte total a Epson TM-T20X II e compatíveis.
@@ -17,9 +17,9 @@ Suporte total a Epson TM-T20X II e compatíveis.
 ## Instalação
 
 ```sh
-npm install react-native-thermal-printer
+npm install siga-printer
 # ou
-yarn add react-native-thermal-printer
+yarn add siga-printer
 ```
 
 ### Android
@@ -54,7 +54,7 @@ Adicione ao `Info.plist` (para Bluetooth MFi):
 ## Uso básico
 
 ```typescript
-import { ThermalPrinter } from 'react-native-thermal-printer';
+import { ThermalPrinter } from 'siga-printer';
 
 // Conectar
 const printer = await ThermalPrinter.connect({
@@ -295,7 +295,7 @@ printer.setOrientation('landscape');
 ### Template de boleto
 
 ```typescript
-import { ThermalPrinter, BoletoTemplate } from 'react-native-thermal-printer';
+import { ThermalPrinter, BoletoTemplate } from 'siga-printer';
 
 const printer = await ThermalPrinter.connect({ type: 'usb' });
 
@@ -337,7 +337,7 @@ await BoletoTemplate.print(printer, {
 ### Descoberta de dispositivos
 
 ```typescript
-import { PrinterDiscovery } from 'react-native-thermal-printer';
+import { PrinterDiscovery } from 'siga-printer';
 
 const discovery = new PrinterDiscovery();
 
@@ -366,7 +366,7 @@ console.log(all);
 ### Perfis de impressora
 
 ```typescript
-import { PRINTER_PROFILES, ThermalPrinter } from 'react-native-thermal-printer';
+import { PRINTER_PROFILES, ThermalPrinter } from 'siga-printer';
 
 const printer = await ThermalPrinter.connect(config, {
   profile: PRINTER_PROFILES.EPSON_TM_T20X, // padrão
@@ -403,7 +403,7 @@ allprojects {
 
 No `Podfile`:
 ```ruby
-pod 'react-native-thermal-printer', :path => '../node_modules/react-native-thermal-printer'
+pod 'siga-printer', :path => '../node_modules/siga-printer'
 ```
 
 ---

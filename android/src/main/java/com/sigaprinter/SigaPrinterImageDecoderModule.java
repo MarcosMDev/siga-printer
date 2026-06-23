@@ -1,4 +1,4 @@
-package com.thermalprinter;
+package com.sigaprinter;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -23,12 +23,12 @@ import java.net.URL;
  * Used by the JS ImageRasterizer to get pixel data
  * without needing a Canvas (not available in RN).
  */
-@ReactModule(name = RNThermalPrinterImageDecoderModule.NAME)
-public class RNThermalPrinterImageDecoderModule extends ReactContextBaseJavaModule {
+@ReactModule(name = SigaPrinterImageDecoderModule.NAME)
+public class SigaPrinterImageDecoderModule extends ReactContextBaseJavaModule {
 
-    public static final String NAME = "ThermalPrinterImageDecoder";
+    public static final String NAME = "SigaPrinterImageDecoder";
 
-    public RNThermalPrinterImageDecoderModule(ReactApplicationContext context) {
+    public SigaPrinterImageDecoderModule(ReactApplicationContext context) {
         super(context);
     }
 

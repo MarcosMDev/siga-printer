@@ -5,12 +5,12 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { ThermalPrinter, PRINTER_PROFILES } from 'react-native-thermal-printer';
+import { ThermalPrinter, PRINTER_PROFILES } from 'siga-printer';
 import type {
   ConnectedThermalPrinter,
   ConnectionConfig,
   PrintOrientation,
-} from 'react-native-thermal-printer';
+} from 'siga-printer';
 import type { RootStackParamList } from '../App';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
@@ -82,7 +82,7 @@ export function HomeScreen({ navigation }: Props) {
     try {
       await globalPrinter
         .init()
-        .text('react-native-thermal-printer', { bold: true, size: 2, align: 'center' })
+        .text('siga-printer', { bold: true, size: 2, align: 'center' })
         .text('Teste de impressão', { align: 'center' })
         .feed(1)
         .divider()

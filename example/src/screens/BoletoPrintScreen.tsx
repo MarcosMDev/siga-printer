@@ -3,8 +3,8 @@ import {
   View, Text, TextInput, TouchableOpacity,
   ScrollView, StyleSheet, Switch, Alert, ActivityIndicator,
 } from 'react-native';
-import { BoletoTemplate } from 'react-native-thermal-printer';
-import type { BoletoData } from 'react-native-thermal-printer';
+import { BoletoTemplate } from 'siga-printer';
+import type { BoletoData } from 'siga-printer';
 import { globalPrinter, globalOrientation } from './HomeScreen';
 
 export function BoletoPrintScreen() {

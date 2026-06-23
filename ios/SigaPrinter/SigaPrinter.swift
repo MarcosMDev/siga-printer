@@ -4,7 +4,7 @@ import ExternalAccessory  // For MFi Bluetooth printers
 import React
 
 // ─────────────────────────────────────────────────────────────
-//  RNThermalPrinter — iOS Swift native module
+//  SigaPrinter — iOS Swift native module
 //
 //  Supports:
 //    - TCP/IP (most common on iOS — direct socket)
@@ -14,8 +14,8 @@ import React
 //  Serial is available only via MFi accessory protocol.
 // ─────────────────────────────────────────────────────────────
 
-@objc(RNThermalPrinter)
-class RNThermalPrinter: NSObject {
+@objc(SigaPrinter)
+class SigaPrinter: NSObject {
 
     // ── State ────────────────────────────────────────────────
 

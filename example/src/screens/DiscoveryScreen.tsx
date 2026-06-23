@@ -5,8 +5,8 @@ import {
 } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../App';
-import { useDiscovery } from 'react-native-thermal-printer';
-import type { DiscoveredDevice } from 'react-native-thermal-printer';
+import { useDiscovery } from 'siga-printer';
+import type { DiscoveredDevice } from 'siga-printer';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Discovery'>;
 

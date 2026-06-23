@@ -16,10 +16,10 @@ import type {
 //    - Old Architecture (NativeModules bridge)
 //    - New Architecture (TurboModule via TurboModuleRegistry)
 //
-//  The TurboModule spec is in NativeRNThermalPrinter.ts (codegen).
+//  The TurboModule spec is in NativeSigaPrinter.ts (codegen).
 // ─────────────────────────────────────────────────────────────
 
-const MODULE_NAME = 'RNThermalPrinter';
+const MODULE_NAME = 'SigaPrinter';
 
 function getNativeModule() {
   // New Architecture: TurboModule
@@ -35,7 +35,7 @@ function getNativeModule() {
   if (mod) return mod;
 
   throw new Error(
-    `[ThermalPrinter] Native module "${MODULE_NAME}" not found. ` +
+    `[SigaPrinter] Native module "${MODULE_NAME}" not found. Did you run `pod install` (iOS) or rebuild the Android project? See the README for installation instructions.` +
     'Did you run `pod install` (iOS) or rebuild the Android project? ' +
     'See the README for installation instructions.',
   );
@@ -128,7 +128,7 @@ export class NativePrinter {
 
 // ─────────────────────────────────────────────────────────────
 //  TurboModule spec (New Architecture codegen)
-//  File: NativeRNThermalPrinter.ts
+//  File: NativeSigaPrinter.ts
 // ─────────────────────────────────────────────────────────────
 
 export type Spec = {

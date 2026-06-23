@@ -1,4 +1,4 @@
-package com.thermalprinter;
+package com.sigaprinter;
 
 import com.facebook.react.ReactPackage;
 import com.facebook.react.bridge.NativeModule;
@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class RNThermalPrinterPackage implements ReactPackage {
+public class SigaPrinterPackage implements ReactPackage {
 
     @Override
     public List<NativeModule> createNativeModules(ReactApplicationContext context) {
         return Arrays.asList(
-            new RNThermalPrinterModule(context),
-            new RNThermalPrinterImageDecoderModule(context)
+            new SigaPrinterModule(context),
+            new SigaPrinterImageDecoderModule(context)
         );
     }
 

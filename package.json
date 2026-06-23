@@ -1,5 +1,5 @@
 {
-  "name": "react-native-thermal-printer",
+  "name": "siga-printer",
   "version": "1.0.0",
   "description": "Full-featured ESC/POS thermal printer library for React Native. Supports Epson TM-T20X II and compatibles via USB, Serial, Bluetooth and TCP/IP.",
   "main": "lib/commonjs/index.js",
@@ -32,7 +32,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "prepare": "bob build",
-    "release": "release-it"
+    "release": "release-it",
+    "prepack": "bob build"
   },
   "keywords": [
     "react-native",
@@ -43,10 +44,23 @@
     "receipt-printer",
     "barcode",
     "qrcode",
-    "boleto"
+    "boleto",
+    "pix",
+    "siga-printer",
+    "impressora-termica"
   ],
-  "repository": "https://github.com/your-org/react-native-thermal-printer",
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MarcosMDev/siga-printer.git"
+  },
+  "homepage": "https://github.com/MarcosMDev/siga-printer#readme",
+  "bugs": {
+    "url": "https://github.com/MarcosMDev/siga-printer/issues"
+  },
+  "author": {
+    "name": "MarcosMDev",
+    "url": "https://github.com/MarcosMDev"
+  },
   "license": "MIT",
   "peerDependencies": {
     "react": "*",
@@ -65,7 +79,9 @@
   },
   "jest": {
     "preset": "react-native",
-    "modulePathIgnorePatterns": ["<rootDir>/lib/"]
+    "modulePathIgnorePatterns": [
+      "<rootDir>/lib/"
+    ]
   },
   "react-native-builder-bob": {
     "source": "src",
@@ -73,11 +89,16 @@
     "targets": [
       "commonjs",
       "module",
-      ["typescript", { "project": "tsconfig.build.json" }]
+      [
+        "typescript",
+        {
+          "project": "tsconfig.build.json"
+        }
+      ]
     ]
   },
   "codegenConfig": {
-    "name": "RNThermalPrinterSpec",
+    "name": "SigaPrinterSpec",
     "type": "modules",
     "jsSrcsDir": "src"
   }

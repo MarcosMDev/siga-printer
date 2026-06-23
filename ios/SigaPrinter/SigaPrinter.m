@@ -1,11 +1,11 @@
 #import <React/RCTBridgeModule.h>
 
 // ─────────────────────────────────────────────────────────────
-//  RNThermalPrinter — Objective-C bridge for Swift module
+//  SigaPrinter — Objective-C bridge for Swift module
 //  Exposes the Swift class to React Native's bridge
 // ─────────────────────────────────────────────────────────────
 
-@interface RCT_EXTERN_MODULE(RNThermalPrinter, NSObject)
+@interface RCT_EXTERN_MODULE(SigaPrinter, NSObject)
 
 RCT_EXTERN_METHOD(
   connect:(NSDictionary *)config

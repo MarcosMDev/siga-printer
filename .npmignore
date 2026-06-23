@@ -1,0 +1,29 @@
+# Development
+__tests__/
+example/
+.github/
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Build artifacts (lib/ is included, build/ is not)
+android/build/
+ios/build/
+ios/SigaPrinter.xcodeproj/
+
+# Config
+.eslintrc*
+.prettierrc*
+tsconfig.json
+tsconfig.build.json
+babel.config.js
+jest.config.js
+.editorconfig
+
+# Misc
+*.log
+.DS_Store
+.env*
+coverage/
+node_modules/

@@ -9,7 +9,7 @@ apply plugin: 'com.android.library'
 
 android {
   compileSdkVersion 34
-  namespace "com.thermalprinter"
+  namespace "com.sigaprinter"
 
   defaultConfig {
     minSdkVersion 21    // Android 5.0 — required for USB Host API on all versions

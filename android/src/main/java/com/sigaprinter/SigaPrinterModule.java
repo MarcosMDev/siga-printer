@@ -1,4 +1,4 @@
-package com.thermalprinter;
+package com.sigaprinter;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -42,11 +42,11 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver;
 import com.hoho.android.usbserial.driver.UsbSerialPort;
 import com.hoho.android.usbserial.driver.UsbSerialProber;
 
-@ReactModule(name = RNThermalPrinterModule.NAME)
-public class RNThermalPrinterModule extends ReactContextBaseJavaModule {
+@ReactModule(name = SigaPrinterModule.NAME)
+public class SigaPrinterModule extends ReactContextBaseJavaModule {
 
-    public static final String NAME = "RNThermalPrinter";
-    private static final String ACTION_USB_PERMISSION = "com.thermalprinter.USB_PERMISSION";
+    public static final String NAME = "SigaPrinter";
+    private static final String ACTION_USB_PERMISSION = "com.sigaprinter.USB_PERMISSION";
 
     // ── State ──────────────────────────────────────────────────
     private final ReactApplicationContext reactContext;
@@ -78,7 +78,7 @@ public class RNThermalPrinterModule extends ReactContextBaseJavaModule {
 
     // ── Constructor ────────────────────────────────────────────
 
-    public RNThermalPrinterModule(ReactApplicationContext context) {
+    public SigaPrinterModule(ReactApplicationContext context) {
         super(context);
         this.reactContext = context;
         this.usbManager   = (UsbManager) context.getSystemService(Context.USB_SERVICE);

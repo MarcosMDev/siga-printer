@@ -6,8 +6,8 @@ import {
 import {
   ThermalPrinter,
   PRINTER_PROFILES,
-} from 'react-native-thermal-printer';
-import type { ImageDitherMode, PrintOrientation } from 'react-native-thermal-printer';
+} from 'siga-printer';
+import type { ImageDitherMode, PrintOrientation } from 'siga-printer';
 import { globalPrinter, globalOrientation } from './HomeScreen';
 
 export function AdvancedScreen() {
