@@ -294,6 +294,20 @@ export class ConnectedThermalPrinter extends ThermalPrinter {
     this.native = new NativePrinter();
   }
 
+  /**
+   * Wrap an already-open NativePrinter (e.g. from printerManager).
+   * The caller owns the connection lifecycle — disconnect() here
+   * will also close the manager's connection.
+   */
+  static fromNative(
+    native:  NativePrinter,
+    options: ThermalPrinterOptions = {},
+  ): ConnectedThermalPrinter {
+    const instance = new ConnectedThermalPrinter({} as ConnectionConfig, options);
+    (instance as any).native = native;
+    return instance;
+  }
+
   async _connect(): Promise<void> {
     await this.native.connect(this.config);
   }

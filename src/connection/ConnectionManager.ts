@@ -1,9 +1,11 @@
 import { NativePrinter } from './native';
+import { ConnectedThermalPrinter } from '../builder/ThermalPrinter';
 import type {
   ConnectionConfig,
   ConnectionStatus,
   DiscoveredDevice,
   ConnectionType,
+  ThermalPrinterOptions,
 } from '../types';
 
 // ─────────────────────────────────────────────────────────────
@@ -83,6 +85,20 @@ export class PrinterConnectionManager {
 
   getState(): ConnectionManagerState {
     return { ...this._state };
+  }
+
+  /**
+   * Returns a ConnectedThermalPrinter backed by the current active connection.
+   * Returns null if not connected.
+   *
+   * Usage:
+   *   const printer = printerManager.getPrinter();
+   *   if (!printer) throw new Error('Not connected');
+   *   await BoletoTemplate.print(printer, { ... });
+   */
+  getPrinter(options: ThermalPrinterOptions = {}): ConnectedThermalPrinter | null {
+    if (!this._native || !this.isConnected) return null;
+    return ConnectedThermalPrinter.fromNative(this._native, options);
   }
 
   get isConnected(): boolean {
