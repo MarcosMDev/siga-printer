@@ -42,4 +42,7 @@ dependencies {
   // USB Serial (for RS-232 via USB adapter)
   // usb-serial-for-android by mik3y — Apache 2.0
   implementation 'com.github.mik3y:usb-serial-for-android:3.4.6'
+
+  // ZXing — pure-Java barcode/QR encoder for landscape rasterization
+  implementation 'com.google.zxing:core:3.5.3'
 }

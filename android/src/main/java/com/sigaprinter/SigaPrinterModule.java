@@ -395,6 +395,121 @@ public class SigaPrinterModule extends ReactContextBaseJavaModule {
         });
     }
 
+    // ── Landscape rasterization ────────────────────────────────
+
+    /**
+     * Renders an array of landscape elements to a full-page rotated raster
+     * and returns GS v 0 bytes. Called by ThermalPrinter.buildLandscape() on JS side.
+     *
+     * Elements schema: {type, ...} — see LandscapeElement in JS types.
+     */
+    @ReactMethod
+    public void renderLandscapeElements(ReadableArray elements, int paperDots, Promise promise) {
+        executor.execute(() -> {
+            try {
+                LandscapeRenderer renderer = new LandscapeRenderer(paperDots);
+
+                for (int i = 0; i < elements.size(); i++) {
+                    ReadableMap el = elements.getMap(i);
+                    if (el == null) continue;
+                    String type = el.hasKey("type") ? el.getString("type") : "";
+                    if (type == null) continue;
+
+                    switch (type) {
+                        case "text": {
+                            String content  = el.hasKey("content")   ? el.getString("content")   : "";
+                            boolean bold    = el.hasKey("bold")      && el.getBoolean("bold");
+                            int size        = el.hasKey("size")      ? el.getInt("size")          : 1;
+                            String align    = el.hasKey("align")     ? el.getString("align")      : "left";
+                            boolean ul      = el.hasKey("underline") && el.getBoolean("underline");
+                            boolean invert  = el.hasKey("invert")    && el.getBoolean("invert");
+                            renderer.addText(content, bold, size, align, ul, invert);
+                            break;
+                        }
+                        case "feed": {
+                            int lines = el.hasKey("lines") ? el.getInt("lines") : 1;
+                            renderer.addFeed(lines);
+                            break;
+                        }
+                        case "feedDots": {
+                            // Convert dot count to approximate line count
+                            int dots  = el.hasKey("dots") ? el.getInt("dots") : 24;
+                            int lines = Math.max(1, dots / 24);
+                            renderer.addFeed(lines);
+                            break;
+                        }
+                        case "divider": {
+                            String style = el.hasKey("style") ? el.getString("style") : "line";
+                            String ch    = el.hasKey("char")  ? el.getString("char")  : null;
+                            renderer.addDivider(style, ch);
+                            break;
+                        }
+                        case "row": {
+                            ReadableArray cells = el.hasKey("cells") ? el.getArray("cells") : null;
+                            if (cells == null) break;
+                            java.util.List<LandscapeRenderer.RowCell> rowCells = new java.util.ArrayList<>();
+                            for (int j = 0; j < cells.size(); j++) {
+                                ReadableMap cell = cells.getMap(j);
+                                if (cell == null) continue;
+                                LandscapeRenderer.RowCell rc = new LandscapeRenderer.RowCell();
+                                rc.text         = cell.hasKey("text")  ? cell.getString("text")  : "";
+                                rc.widthPercent = cell.hasKey("width") ? cell.getInt("width")    : 33;
+                                rc.align        = cell.hasKey("align") ? cell.getString("align") : "left";
+                                rc.bold         = cell.hasKey("bold")  && cell.getBoolean("bold");
+                                rowCells.add(rc);
+                            }
+                            renderer.addRow(rowCells);
+                            break;
+                        }
+                        case "barcode": {
+                            String data   = el.hasKey("data")        ? el.getString("data")        : "";
+                            String btType = el.hasKey("barcodeType") ? el.getString("barcodeType") : "CODE128";
+                            int height    = el.hasKey("height")      ? el.getInt("height")         : 60;
+                            String align  = el.hasKey("align")       ? el.getString("align")       : "center";
+                            String hriPos = el.hasKey("hriPosition") ? el.getString("hriPosition") : "below";
+                            boolean hriBelow = !"above".equals(hriPos) && !"none".equals(hriPos);
+                            renderer.addBarcode(data, btType, height, align, hriBelow);
+                            break;
+                        }
+                        case "qrcode": {
+                            String data      = el.hasKey("data")       ? el.getString("data")       : "";
+                            int size         = el.hasKey("size")       ? el.getInt("size")          : 5;
+                            String errLevel  = el.hasKey("errorLevel") ? el.getString("errorLevel") : "M";
+                            String align     = el.hasKey("align")      ? el.getString("align")      : "center";
+                            renderer.addQRCode(data, size, errLevel, align);
+                            break;
+                        }
+                        case "image": {
+                            ReadableArray byteArr = el.hasKey("bytes") ? el.getArray("bytes") : null;
+                            if (byteArr == null) break;
+                            int widthBytes = el.hasKey("widthBytes")  ? el.getInt("widthBytes")  : 0;
+                            int heightDots = el.hasKey("heightDots")  ? el.getInt("heightDots")  : 0;
+                            String align   = el.hasKey("align")       ? el.getString("align")    : "center";
+                            if (widthBytes <= 0 || heightDots <= 0) break;
+                            int[] imageBytes = new int[byteArr.size()];
+                            for (int j = 0; j < byteArr.size(); j++) {
+                                imageBytes[j] = byteArr.getInt(j);
+                            }
+                            renderer.addImage(imageBytes, widthBytes, heightDots, align);
+                            break;
+                        }
+                        // "init", "cut", "raw" — ignored; JS side handles cut separately
+                    }
+                }
+
+                byte[] rasterBytes = renderer.finish();
+
+                com.facebook.react.bridge.WritableArray result = Arguments.createArray();
+                for (byte b : rasterBytes) {
+                    result.pushInt(b & 0xff);
+                }
+                promise.resolve(result);
+            } catch (Exception e) {
+                promise.reject("LANDSCAPE_ERROR", e.getMessage(), e);
+            }
+        });
+    }
+
     // ── Helpers ────────────────────────────────────────────────
 
     /** Returns true if the USB device is likely a printer (by interface class or vendor ID). */

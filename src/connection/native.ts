@@ -124,6 +124,25 @@ export class NativePrinter {
   async openCashDrawer(options: CashDrawerOptions): Promise<boolean> {
     return this.mod.openCashDrawer(options);
   }
+
+  // ── Landscape rasterization ──────────────────────────────────
+
+  /**
+   * Renders landscape elements to a full-page rotated GS v 0 raster.
+   * Android only — throws on iOS (landscape rasterization not supported there).
+   */
+  static async renderLandscapeElements(
+    elements: object[],
+    paperDots: number,
+  ): Promise<number[]> {
+    if (Platform.OS !== 'android') {
+      throw new Error(
+        '[SigaPrinter] Landscape full-page rasterization requires Android. ' +
+        'iOS does not support this feature yet.',
+      );
+    }
+    return getNativeModule().renderLandscapeElements(elements, paperDots);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────

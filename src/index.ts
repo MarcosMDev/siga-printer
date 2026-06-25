@@ -75,6 +75,9 @@ export type {
   // Result
   PrintResult,
   PrintJob,
+
+  // Landscape
+  LandscapeElement,
 } from './types';
 
 // Template data types

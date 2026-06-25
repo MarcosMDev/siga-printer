@@ -280,6 +280,26 @@ export interface DiscoveredDevice {
   rssi?: number;
 }
 
+// ── Landscape elements (full-page rasterization) ─────────────
+//
+// When orientation='landscape', ThermalPrinter collects these specs
+// instead of ESC/POS bytes and passes them to the native
+// LandscapeRenderer (Android) which draws everything to a Canvas,
+// rotates 90° CW, and returns GS v 0 raster bytes.
+
+export type LandscapeElement =
+  | { type: 'init' }
+  | { type: 'text';     content: string; bold: boolean; size: number; align: string; underline: boolean; invert: boolean; }
+  | { type: 'feed';     lines: number; }
+  | { type: 'feedDots'; dots: number; }
+  | { type: 'divider';  style: string; char?: string; }
+  | { type: 'row';      cells: Array<{ text: string; width: number; align: string; bold: boolean; }>; }
+  | { type: 'barcode';  data: string; barcodeType: string; height: number; align: string; hriPosition: string; }
+  | { type: 'qrcode';   data: string; size: number; errorLevel: string; align: string; }
+  | { type: 'image';    bytes: number[]; widthBytes: number; heightDots: number; align: string; }
+  | { type: 'cut';      mode: string; feed: number; }
+  | { type: 'raw' };
+
 // ── Native module spec (for codegen) ─────────────────────────
 
 export interface ThermalPrinterNativeSpec {

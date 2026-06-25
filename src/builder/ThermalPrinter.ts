@@ -12,6 +12,7 @@ import type {
   SectionOptions,
   PrintResult,
   PrintOrientation,
+  LandscapeElement,
 } from '../types';
 
 import { ESCPOSEncoder } from '../encoder/encoder';
@@ -39,22 +40,26 @@ type SyncStep  = () => number[];
 type AsyncStep = () => Promise<number[]>;
 type Step = SyncStep | AsyncStep;
 
+type LandscapeStep = () => LandscapeElement | Promise<LandscapeElement>;
+
 export class ThermalPrinter {
-  private encoder:     ESCPOSEncoder;
-  private options:     ThermalPrinterOptions;
-  private steps:       Step[];
-  private orientation: PrintOrientation;
+  private encoder:         ESCPOSEncoder;
+  private options:         ThermalPrinterOptions;
+  private steps:           Step[];
+  private landscapeSteps:  LandscapeStep[];
+  private orientation:     PrintOrientation;
 
   protected constructor(options: ThermalPrinterOptions = {}) {
-    this.options     = options;
-    this.orientation = options.orientation ?? 'portrait';
+    this.options        = options;
+    this.orientation    = options.orientation ?? 'portrait';
 
     this.encoder = new ESCPOSEncoder(
       options.profile ?? DEFAULT_PROFILE,
       options.charset ?? 'CP860',
     );
 
-    this.steps = [];
+    this.steps          = [];
+    this.landscapeSteps = [];
   }
 
   // ── Factory ─────────────────────────────────────────────────
@@ -104,6 +109,7 @@ export class ThermalPrinter {
    */
   init(): this {
     this.steps.push(() => this.encoder.init());
+    this.landscapeSteps.push(() => ({ type: 'init' as const }));
     return this;
   }
 
@@ -111,6 +117,15 @@ export class ThermalPrinter {
 
   text(content: string, options?: TextOptions): this {
     this.steps.push(() => this.encoder.text(content, options));
+    this.landscapeSteps.push(() => ({
+      type:      'text'           as const,
+      content:   content         ?? '',
+      bold:      options?.bold   ?? false,
+      size:      options?.size   ?? 1,
+      align:     options?.align  ?? 'left',
+      underline: !!options?.underline,
+      invert:    options?.invert ?? false,
+    }));
     return this;
   }
 
@@ -123,11 +138,13 @@ export class ThermalPrinter {
 
   feed(lines = 1): this {
     this.steps.push(() => this.encoder.feed(lines));
+    this.landscapeSteps.push(() => ({ type: 'feed' as const, lines }));
     return this;
   }
 
   feedDots(dots: number): this {
     this.steps.push(() => this.encoder.feedDots(dots));
+    this.landscapeSteps.push(() => ({ type: 'feedDots' as const, dots }));
     return this;
   }
 
@@ -135,6 +152,11 @@ export class ThermalPrinter {
 
   divider(options?: DividerOptions): this {
     this.steps.push(() => this.encoder.divider(options));
+    this.landscapeSteps.push(() => ({
+      type:  'divider' as const,
+      style: options?.style ?? 'line',
+      char:  options?.char,
+    }));
     return this;
   }
 
@@ -142,6 +164,13 @@ export class ThermalPrinter {
 
   section(title: string, options?: Omit<SectionOptions, 'title'>): this {
     this.steps.push(() => this.encoder.section({ title, ...options }));
+    const divChar    = options?.dividerChar ?? '-';
+    const finalTitle = options?.uppercase ? title.toUpperCase() : title;
+    this.landscapeSteps.push(
+      () => ({ type: 'divider' as const, style: 'line', char: divChar }),
+      () => ({ type: 'text' as const, content: finalTitle, bold: options?.bold ?? true, size: 1, align: 'center', underline: false, invert: false }),
+      () => ({ type: 'divider' as const, style: 'line', char: divChar }),
+    );
     return this;
   }
 
@@ -157,8 +186,17 @@ export class ThermalPrinter {
    *     { text: 'R$ 1.250,00', width: 40, align: 'right' },
    *   ])
    */
-  row(cells: TableOptions['cells'], divider = false): this {
-    this.steps.push(() => this.encoder.table({ cells, divider }));
+  row(cells: TableOptions['cells'], dividerLine = false): this {
+    this.steps.push(() => this.encoder.table({ cells, divider: dividerLine }));
+    this.landscapeSteps.push(() => ({
+      type:  'row' as const,
+      cells: cells.map(c => ({
+        text:  c.text  ?? '',
+        width: c.width ?? 33,
+        align: c.align ?? 'left',
+        bold:  c.bold  ?? false,
+      })),
+    }));
     return this;
   }
 
@@ -178,6 +216,14 @@ export class ThermalPrinter {
    */
   barcode(data: string, options?: BarcodeOptions): this {
     this.steps.push(() => this.encoder.barcode(data, options));
+    this.landscapeSteps.push(() => ({
+      type:        'barcode'               as const,
+      data,
+      barcodeType: options?.type          ?? 'CODE128',
+      height:      options?.height        ?? 60,
+      align:       options?.align         ?? 'center',
+      hriPosition: options?.hriPosition   ?? 'below',
+    }));
     return this;
   }
 
@@ -185,6 +231,13 @@ export class ThermalPrinter {
 
   qrCode(data: string, options?: QRCodeOptions): this {
     this.steps.push(() => this.encoder.qrCode(data, options));
+    this.landscapeSteps.push(() => ({
+      type:       'qrcode'              as const,
+      data,
+      size:       options?.size        ?? 5,
+      errorLevel: options?.errorLevel  ?? 'M',
+      align:      options?.align       ?? 'center',
+    }));
     return this;
   }
 
@@ -198,15 +251,20 @@ export class ThermalPrinter {
    *   - 'data:image/png;...'  — base64 data URI
    *   - 'https://...'         — remote URL (fetched at build time)
    *
-   * For landscape prints, if orientation is 'landscape', the image
-   * is automatically rotated 90° via ImageRasterizer.renderLandscape().
+   * In landscape mode, the image is included in the full-page
+   * raster so it rotates with the rest of the content.
    */
   image(options: ImageOptions): this {
-    this.steps.push(async () => {
-      if (this.orientation === 'landscape') {
-        return this.encoder.imageLandscape(options);
-      }
-      return this.encoder.image(options);
+    this.steps.push(async () => this.encoder.image(options));
+    this.landscapeSteps.push(async () => {
+      const { widthBytes, heightDots, bytes } = await this.encoder.rasterizeRaw(options);
+      return {
+        type:      'image' as const,
+        bytes,
+        widthBytes,
+        heightDots,
+        align: options.align ?? 'center',
+      };
     });
     return this;
   }
@@ -216,6 +274,7 @@ export class ThermalPrinter {
   /** Inject arbitrary ESC/POS bytes. Use for commands not yet wrapped. */
   raw(bytes: number[]): this {
     this.steps.push(() => bytes);
+    this.landscapeSteps.push(() => ({ type: 'raw' as const }));
     return this;
   }
 
@@ -223,6 +282,11 @@ export class ThermalPrinter {
 
   cut(mode: CutOptions['mode'] = 'full', options?: Omit<CutOptions, 'mode'>): this {
     this.steps.push(() => this.encoder.cut({ mode, ...options }));
+    this.landscapeSteps.push(() => ({
+      type: 'cut' as const,
+      mode: mode ?? 'full',
+      feed: options?.feed ?? 3,
+    }));
     return this;
   }
 
@@ -230,16 +294,21 @@ export class ThermalPrinter {
 
   cashDrawer(options?: CashDrawerOptions): this {
     this.steps.push(() => this.encoder.cashDrawer(options));
+    // no landscape element — open drawer immediately via the portrait byte path
     return this;
   }
 
   // ── Build ────────────────────────────────────────────────────
 
   /**
-   * Resolve all steps (including async image loading/rasterizing)
-   * and return the final byte array.
+   * Resolve all steps and return the final byte array.
+   * In landscape mode, renders via LandscapeRenderer (Android native Canvas).
    */
   async build(): Promise<Uint8Array> {
+    if (this.orientation === 'landscape') {
+      return this._buildLandscape();
+    }
+
     const chunks: number[][] = [];
 
     for (const step of this.steps) {
@@ -272,9 +341,55 @@ export class ThermalPrinter {
     return output;
   }
 
+  /**
+   * Full-page landscape rasterization (Option A).
+   *
+   * All content elements are sent to Android's LandscapeRenderer which:
+   *  1. Draws each element onto an off-screen Canvas (portrait orientation)
+   *  2. Rotates the full canvas 90° CW
+   *  3. Returns GS v 0 raster bytes
+   *
+   * JS wraps with ESC @ init and appends cut if needed.
+   */
+  private async _buildLandscape(): Promise<Uint8Array> {
+    const profile = this.options.profile ?? DEFAULT_PROFILE;
+
+    // Resolve all landscape steps
+    const elements: LandscapeElement[] = [];
+    let needsCut = false;
+
+    for (const step of this.landscapeSteps) {
+      const el = await step();
+      if (el.type === 'cut') {
+        needsCut = true;
+      } else if (el.type !== 'raw' && el.type !== 'init') {
+        elements.push(el);
+      }
+    }
+
+    if (this.options.autoCut) needsCut = true;
+
+    // Native render → GS v 0 bytes
+    const rasterBytes = await NativePrinter.renderLandscapeElements(
+      elements,
+      profile.dotsPerLine,
+    );
+
+    // Build full print sequence: init + raster + trailing
+    const init = [0x1b, 0x40]; // ESC @ — initialize printer
+    const tail = needsCut
+      ? this.encoder.cut({ mode: this.options.autoCutMode ?? 'full', feed: 3 })
+      : this.options.feedAfterPrint
+        ? this.encoder.feed(this.options.feedAfterPrint)
+        : [];
+
+    return new Uint8Array([...init, ...rasterBytes, ...tail]);
+  }
+
   /** Reset all queued steps (keep encoder settings) */
   reset(): this {
-    this.steps = [];
+    this.steps          = [];
+    this.landscapeSteps = [];
     return this;
   }
 }

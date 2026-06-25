@@ -275,6 +275,25 @@ export class ESCPOSEncoder {
     return bytes;
   }
 
+  /**
+   * Rasterizes an image to raw 1-bit packed bytes (MSB first) without
+   * any GS v 0 header. Used by ThermalPrinter.buildLandscape() to embed
+   * images into the landscape raster via LandscapeRenderer.addImage().
+   */
+  async rasterizeRaw(options: ImageOptions): Promise<{ widthBytes: number; heightDots: number; bytes: number[] }> {
+    const rasterizer = new ImageRasterizer(this.profile);
+    const { widthBytes, heightDots, pixels } = await rasterizer.rasterize(
+      options.source,
+      {
+        targetWidth:  options.width,
+        targetHeight: options.height,
+        dither:       options.dither    ?? 'floyd-steinberg',
+        threshold:    options.threshold ?? 0.5,
+      },
+    );
+    return { widthBytes, heightDots, bytes: Array.from(pixels) };
+  }
+
   async imageLandscape(options: ImageOptions): Promise<number[]> {
     const rasterizer = new ImageRasterizer(this.profile);
     const { widthBytes, heightDots, pixels } = await rasterizer.renderLandscape(
