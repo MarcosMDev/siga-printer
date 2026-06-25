@@ -9,6 +9,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
+import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbManager;
 import android.os.Build;
 
@@ -125,13 +126,24 @@ public class SigaPrinterModule extends ReactContextBaseJavaModule {
             }
         };
 
-        int flags = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
-            ? PendingIntent.FLAG_MUTABLE
-            : 0;
-        PendingIntent pi = PendingIntent.getBroadcast(
-            reactContext, 0, new Intent(ACTION_USB_PERMISSION), flags);
+        // Explicit intent required on Android 14+ with FLAG_MUTABLE
+        Intent permIntent = new Intent(ACTION_USB_PERMISSION);
+        permIntent.setPackage(reactContext.getPackageName());
 
-        reactContext.registerReceiver(receiver, filter);
+        // FLAG_MUTABLE is needed so UsbManager can write EXTRA_PERMISSION_GRANTED into
+        // the PendingIntent extras. The explicit package makes it safe on API 34+.
+        int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            piFlags |= PendingIntent.FLAG_MUTABLE;
+        }
+        PendingIntent pi = PendingIntent.getBroadcast(reactContext, 0, permIntent, piFlags);
+
+        // API 33+ requires exported flag on dynamic receivers
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            reactContext.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            reactContext.registerReceiver(receiver, filter);
+        }
         usbManager.requestPermission(device, pi);
     }
 
@@ -326,9 +338,12 @@ public class SigaPrinterModule extends ReactContextBaseJavaModule {
                     case "usb":
                         HashMap<String, UsbDevice> usbDevices = usbManager.getDeviceList();
                         for (UsbDevice d : usbDevices.values()) {
+                            if (!isPrinterDevice(d)) continue;
                             WritableMap dev = Arguments.createMap();
                             dev.putString("type",      "usb");
-                            dev.putString("name",      d.getDeviceName());
+                            dev.putString("name",      d.getProductName() != null
+                                                        ? d.getProductName()
+                                                        : d.getDeviceName());
                             dev.putString("address",   d.getDeviceName());
                             dev.putInt("vendorId",     d.getVendorId());
                             dev.putInt("productId",    d.getProductId());
@@ -381,6 +396,29 @@ public class SigaPrinterModule extends ReactContextBaseJavaModule {
     }
 
     // ── Helpers ────────────────────────────────────────────────
+
+    /** Returns true if the USB device is likely a printer (by interface class or vendor ID). */
+    private boolean isPrinterDevice(UsbDevice d) {
+        // Check USB interface class 7 = USB_CLASS_PRINTER
+        for (int i = 0; i < d.getInterfaceCount(); i++) {
+            if (d.getInterface(i).getInterfaceClass() == UsbConstants.USB_CLASS_PRINTER) {
+                return true;
+            }
+        }
+        // Fallback: known thermal printer vendor IDs
+        switch (d.getVendorId()) {
+            case 0x04b8: // Epson
+            case 0x0519: // Star Micronics
+            case 0x154f: // SEWOO / Bixolon
+            case 0x1FC9: // Bixolon (alt)
+            case 0x0dd4: // Custom Engineering
+            case 0x0fe6: // ICS Advent (generic thermal)
+            case 0x28e9: // GD32 based thermal printers
+                return true;
+            default:
+                return false;
+        }
+    }
 
     @Nullable
     private UsbDevice findUSBDevice(int vendorId, int productId) {
