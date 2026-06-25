@@ -10,12 +10,14 @@ Full support for Epson TM-T20X II and compatible printers.
 
 ---
 
-## What's new in v1.4.0
+## What's new in v1.5.4
 
-- **Expo config plugin** — now also auto-injects JitPack into `android/build.gradle` (zero manual setup)
-- **Expo support** — config plugin auto-configures AndroidManifest, Info.plist and build.gradle via `expo prebuild` / EAS Build
+- **`printerManager.getPrinter()`** — retrieve the active `ConnectedThermalPrinter` from any screen without opening a second connection
+- **Android 14 fix** — `PendingIntent` now uses explicit intent + `RECEIVER_NOT_EXPORTED` (required for API 34+)
+- **USB discovery filter** — only shows actual printers (USB class 7 + known vendor IDs); chargers and hubs no longer appear
+- **Expo config plugin** — auto-configures AndroidManifest, Info.plist and JitPack in `android/build.gradle`
 - **`TemplateDesigner`** — visual drag-and-drop canvas to build print templates and export typed TypeScript code
-- **`PrintPreview` / `PrintPreviewBuilder`** — realistic thermal paper preview with landscape mode (content rotated 90°, paper stays vertical)
+- **`PrintPreview` / `PrintPreviewBuilder`** — realistic thermal paper preview with landscape mode
 - **`ConnectionManager`** — global singleton for connection state across screens with auto-reconnect
 - **`useConnectionManager`** hook + **`PrinterSelector`** component
 
@@ -370,6 +372,24 @@ function SetupScreen() {
 
 `PrinterSelector` includes: scan by type, device list with icons, per-device connect/disconnect buttons, real-time status banner.
 
+```typescript
+// ── Print from any screen after connecting ────────────────────
+
+import { printerManager, BoletoTemplate } from 'siga-printer';
+
+async function handlePrint() {
+  // Reuses the connection made by PrinterSelector — no second connect()
+  const printer = printerManager.getPrinter();
+  if (!printer) {
+    console.error('Not connected');
+    return;
+  }
+  await BoletoTemplate.print(printer, { ... });
+}
+```
+
+`getPrinter()` returns a `ConnectedThermalPrinter` backed by the already-open connection. Returns `null` if not connected. Use `useConnectionManager()` reactively to guard the UI, and `printerManager.getPrinter()` imperatively when printing.
+
 ---
 
 ### Print preview
@@ -539,12 +559,14 @@ MIT
 <a name="português"></a>
 # Português
 
-## Novidades na v1.4.0
+## Novidades na v1.5.4
 
-- **Expo config plugin** — agora também injeta JitPack no `android/build.gradle` automaticamente (zero configuração manual)
-- **Suporte a Expo** — config plugin configura automaticamente AndroidManifest, Info.plist e build.gradle via `expo prebuild` / EAS Build
+- **`printerManager.getPrinter()`** — recupera o `ConnectedThermalPrinter` ativo de qualquer tela sem abrir uma segunda conexão
+- **Fix Android 14** — `PendingIntent` agora usa intent explícito + `RECEIVER_NOT_EXPORTED` (exigido no API 34+)
+- **Filtro de discovery USB** — exibe apenas impressoras (classe USB 7 + vendor IDs conhecidos); carregadores e hubs não aparecem mais
+- **Expo config plugin** — configura automaticamente AndroidManifest, Info.plist e JitPack no `android/build.gradle`
 - **`TemplateDesigner`** — canvas drag-and-drop visual para criar templates de impressão e exportar código TypeScript tipado
-- **`PrintPreview` / `PrintPreviewBuilder`** — preview realista em papel térmico com modo paisagem (conteúdo girado 90°, papel permanece vertical)
+- **`PrintPreview` / `PrintPreviewBuilder`** — preview realista em papel térmico com modo paisagem
 - **`ConnectionManager`** — singleton global de estado de conexão entre telas com reconexão automática
 - **Hook `useConnectionManager`** + componente **`PrinterSelector`**
 
@@ -895,6 +917,24 @@ function TelaConexao() {
 ```
 
 `PrinterSelector` inclui: busca por tipo, lista de dispositivos com ícones, botão conectar/desconectar por item, banner de status em tempo real.
+
+```typescript
+// ── Imprimir de qualquer tela após conectar ───────────────────
+
+import { printerManager, BoletoTemplate } from 'siga-printer';
+
+async function handleImprimir() {
+  // Reutiliza a conexão feita pelo PrinterSelector — sem segundo connect()
+  const printer = printerManager.getPrinter();
+  if (!printer) {
+    console.error('Não conectado');
+    return;
+  }
+  await BoletoTemplate.print(printer, { ... });
+}
+```
+
+`getPrinter()` retorna um `ConnectedThermalPrinter` usando a conexão já aberta. Retorna `null` se não conectado. Use `useConnectionManager()` reativamente para guardar a UI, e `printerManager.getPrinter()` imperativamente na hora de imprimir.
 
 ---
 
