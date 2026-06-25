@@ -10,9 +10,10 @@ Full support for Epson TM-T20X II and compatible printers.
 
 ---
 
-## What's new in v1.3.0
+## What's new in v1.4.0
 
-- **Expo support** — config plugin auto-configures AndroidManifest and Info.plist via `expo prebuild` / EAS Build
+- **Expo config plugin** — now also auto-injects JitPack into `android/build.gradle` (zero manual setup)
+- **Expo support** — config plugin auto-configures AndroidManifest, Info.plist and build.gradle via `expo prebuild` / EAS Build
 - **`TemplateDesigner`** — visual drag-and-drop canvas to build print templates and export typed TypeScript code
 - **`PrintPreview` / `PrintPreviewBuilder`** — realistic thermal paper preview with landscape mode (content rotated 90°, paper stays vertical)
 - **`ConnectionManager`** — global singleton for connection state across screens with auto-reconnect
@@ -538,9 +539,10 @@ MIT
 <a name="português"></a>
 # Português
 
-## Novidades na v1.3.0
+## Novidades na v1.4.0
 
-- **Suporte a Expo** — config plugin configura automaticamente AndroidManifest e Info.plist via `expo prebuild` / EAS Build
+- **Expo config plugin** — agora também injeta JitPack no `android/build.gradle` automaticamente (zero configuração manual)
+- **Suporte a Expo** — config plugin configura automaticamente AndroidManifest, Info.plist e build.gradle via `expo prebuild` / EAS Build
 - **`TemplateDesigner`** — canvas drag-and-drop visual para criar templates de impressão e exportar código TypeScript tipado
 - **`PrintPreview` / `PrintPreviewBuilder`** — preview realista em papel térmico com modo paisagem (conteúdo girado 90°, papel permanece vertical)
 - **`ConnectionManager`** — singleton global de estado de conexão entre telas com reconexão automática
