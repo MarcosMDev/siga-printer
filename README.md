@@ -29,7 +29,41 @@ npm install siga-printer
 yarn add siga-printer
 ```
 
-### Android
+### Expo (bare workflow / EAS Build)
+
+> **Managed workflow is not supported** — this library has native modules.
+> Use bare workflow (`expo prebuild`) or Expo Dev Client.
+
+Add the config plugin to `app.json`:
+
+```json
+{
+  "expo": {
+    "plugins": ["siga-printer"]
+  }
+}
+```
+
+Then run:
+
+```sh
+expo prebuild
+# or (EAS)
+eas build
+```
+
+The plugin automatically adds all required Android permissions and iOS plist entries — no manual setup needed.
+
+Also add to `android/build.gradle`:
+```gradle
+allprojects {
+  repositories {
+    maven { url 'https://jitpack.io' }
+  }
+}
+```
+
+### Bare React Native
 
 Add to `android/app/src/main/AndroidManifest.xml`:
 
@@ -519,7 +553,41 @@ npm install siga-printer
 yarn add siga-printer
 ```
 
-### Android
+### Expo (bare workflow / EAS Build)
+
+> **Managed workflow não é suportado** — a lib tem módulos nativos.
+> Use bare workflow (`expo prebuild`) ou Expo Dev Client.
+
+Adicione o config plugin no `app.json`:
+
+```json
+{
+  "expo": {
+    "plugins": ["siga-printer"]
+  }
+}
+```
+
+Depois rode:
+
+```sh
+expo prebuild
+# ou (EAS)
+eas build
+```
+
+O plugin adiciona automaticamente todas as permissões Android e entradas do Info.plist iOS — sem configuração manual.
+
+Adicione também ao `android/build.gradle`:
+```gradle
+allprojects {
+  repositories {
+    maven { url 'https://jitpack.io' }
+  }
+}
+```
+
+### React Native puro
 
 Adicione ao `android/app/src/main/AndroidManifest.xml`:
 
