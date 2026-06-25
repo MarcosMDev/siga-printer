@@ -1,4 +1,4 @@
-const { withAndroidManifest, withInfoPlist } = require('@expo/config-plugins');
+const { withAndroidManifest, withInfoPlist, withProjectBuildGradle } = require('@expo/config-plugins');
 
 /**
  * Expo config plugin for siga-printer.
@@ -32,6 +32,17 @@ function withSigaPrinter(config) {
       }
     }
 
+    return cfg;
+  });
+
+  // JitPack repository — required for usb-serial-for-android
+  config = withProjectBuildGradle(config, (cfg) => {
+    if (!cfg.modResults.contents.includes('jitpack.io')) {
+      cfg.modResults.contents = cfg.modResults.contents.replace(
+        /allprojects\s*\{[\s\S]*?repositories\s*\{/,
+        (match) => `${match}\n        maven { url 'https://jitpack.io' }`,
+      );
+    }
     return cfg;
   });
 

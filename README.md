@@ -65,16 +65,7 @@ expo prebuild
 eas build
 ```
 
-The plugin automatically adds all required Android permissions and iOS plist entries — no manual setup needed.
-
-Also add to `android/build.gradle`:
-```gradle
-allprojects {
-  repositories {
-    maven { url 'https://jitpack.io' }
-  }
-}
-```
+The plugin automatically adds all required Android permissions, iOS plist entries, and the JitPack repository — no manual setup needed.
 
 ### Bare React Native
 
@@ -599,16 +590,7 @@ expo prebuild
 eas build
 ```
 
-O plugin adiciona automaticamente todas as permissões Android e entradas do Info.plist iOS — sem configuração manual.
-
-Adicione também ao `android/build.gradle`:
-```gradle
-allprojects {
-  repositories {
-    maven { url 'https://jitpack.io' }
-  }
-}
-```
+O plugin adiciona automaticamente todas as permissões Android, entradas do Info.plist iOS e o repositório JitPack — sem configuração manual.
 
 ### React Native puro
 
