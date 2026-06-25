@@ -6,6 +6,7 @@ buildscript {
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.facebook.react'
 
 android {
   compileSdkVersion 34
