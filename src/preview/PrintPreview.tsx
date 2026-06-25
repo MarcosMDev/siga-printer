@@ -88,6 +88,12 @@ export function PrintPreview({
   // mm-to-px scale
   const mmToPx = paperPx / profile.paperWidth;
 
+  // Estimated content height in px (for landscape container sizing)
+  const contentHeightPx = Math.max(
+    builder.estimatedLengthMm * mmToPx,
+    paperPx,
+  );
+
   const metrics = useMemo(() => ({
     overflowCount:     builder.overflowCount,
     hasOverflow:       builder.hasOverflow,
@@ -95,9 +101,93 @@ export function PrintPreview({
     elementCount:      elements.length,
   }), [elements]);
 
+  // ── Portrait content (shared between both orientations) ──────
+  const paperContent = (
+    <View style={styles.paperContent}>
+      {elements.map((el, i) => (
+        <ElementRenderer
+          key={i}
+          element={el}
+          paperPx={paperPx}
+          mmToPx={mmToPx}
+          highlightOverflow={highlightOverflow}
+        />
+      ))}
+      {elements.length === 0 && (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>Nenhum conteúdo adicionado</Text>
+          <Text style={styles.emptySubText}>
+            Use o editor ao lado para montar sua impressão
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  // ── Landscape: portrait paper strip, content rotated 90° CW inside ─
+  // Physical thermal paper always comes out portrait (|). In landscape mode
+  // the content bitmap is rotated 90° before printing — so the preview shows
+  // a portrait strip with content visually sideways (as it looks on the paper
+  // before you rotate the paper to read it).
+  //
+  // Pre-rotation view:  width=contentHeightPx, height=paperPx
+  // After 90° CW:       visual width=paperPx, visual height=contentHeightPx
+  // Positioning:        left = -offset, top = offset
+  //                     where offset = (contentHeightPx - paperPx) / 2
+  if (orientation === 'landscape') {
+    const offset = (contentHeightPx - paperPx) / 2;
+    return (
+      <View style={[styles.container, style]}>
+        {showMetrics && (
+          <MetricsBar
+            profile={profile}
+            orientation={orientation}
+            overflowCount={metrics.overflowCount}
+            estimatedLengthMm={metrics.estimatedLengthMm}
+            elementCount={metrics.elementCount}
+          />
+        )}
+
+        {/* Landscape hint */}
+        <View style={styles.landscapeHint}>
+          <Text style={styles.landscapeHintText}>
+            ↕ Paisagem — papel vertical, conteúdo girado 90°
+          </Text>
+        </View>
+
+        <ScrollView
+          horizontal={false}
+          showsVerticalScrollIndicator
+          contentContainerStyle={styles.scrollContent}
+        >
+          {/* Portrait container: width=paperPx, height=contentHeightPx */}
+          <View style={{ width: paperPx, height: contentHeightPx }}>
+            {/* Pre-rotation: wide+short → after 90° CW: narrow+tall = portrait */}
+            <View style={[
+              styles.paper,
+              {
+                position: 'absolute',
+                width:  contentHeightPx,
+                height: paperPx,
+                left: -offset,
+                top:   offset,
+                transform: [{ rotate: '90deg' }],
+              },
+            ]}>
+              <View style={[styles.paperEdge, styles.paperEdgeTop]} />
+              {showRuler && <Ruler widthPx={paperPx} mmToPx={mmToPx} />}
+              {paperContent}
+              <View style={[styles.paperEdge, styles.paperEdgeBottom]} />
+            </View>
+          </View>
+        </ScrollView>
+      </View>
+    );
+  }
+
+  // ── Portrait (default) ───────────────────────────────────────
   return (
     <View style={[styles.container, style]}>
-      {/* Metrics bar */}
       {showMetrics && (
         <MetricsBar
           profile={profile}
@@ -113,40 +203,10 @@ export function PrintPreview({
         showsVerticalScrollIndicator
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Paper */}
-        <View style={[
-          styles.paper,
-          { width: paperPx },
-        ]}>
-          {/* Paper top edge */}
+        <View style={[styles.paper, { width: paperPx }]}>
           <View style={[styles.paperEdge, styles.paperEdgeTop]} />
-
-          {/* Ruler */}
           {showRuler && <Ruler widthPx={paperPx} mmToPx={mmToPx} />}
-
-          {/* Content */}
-          <View style={styles.paperContent}>
-            {elements.map((el, i) => (
-              <ElementRenderer
-                key={i}
-                element={el}
-                paperPx={paperPx}
-                mmToPx={mmToPx}
-                highlightOverflow={highlightOverflow}
-              />
-            ))}
-
-            {elements.length === 0 && (
-              <View style={styles.emptyState}>
-                <Text style={styles.emptyText}>Nenhum conteúdo adicionado</Text>
-                <Text style={styles.emptySubText}>
-                  Use o editor ao lado para montar sua impressão
-                </Text>
-              </View>
-            )}
-          </View>
-
-          {/* Paper bottom edge */}
+          {paperContent}
           <View style={[styles.paperEdge, styles.paperEdgeBottom]} />
         </View>
       </ScrollView>
@@ -612,6 +672,10 @@ function OverflowTag({ message }: { message: string }) {
 const styles = StyleSheet.create({
   container:        { flex: 1, backgroundColor: '#1a1a2e' },
   scrollContent:    { alignItems: 'center', paddingVertical: 16 },
+
+  // Landscape hint bar
+  landscapeHint:    { paddingHorizontal: 12, paddingVertical: 6, backgroundColor: '#0f0f1a', borderBottomWidth: 1, borderBottomColor: '#2a2a3e' },
+  landscapeHintText:{ fontSize: 11, color: '#7c6ef0' },
 
   // Metrics
   metricsBar:       { flexDirection: 'row', flexWrap: 'wrap', padding: 8, gap: 6, backgroundColor: '#0f0f1a', borderBottomWidth: 1, borderBottomColor: '#2a2a3e' },
