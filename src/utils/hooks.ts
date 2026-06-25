@@ -214,7 +214,7 @@ export interface UseConnectionManagerReturn extends ConnectionManagerState {
 
 export function useConnectionManager(): UseConnectionManagerReturn {
   const [state, setState] = useState<ConnectionManagerState>(
-    printerManager.getState,
+    () => printerManager.getState(),
   );
 
   useEffect(() => {
