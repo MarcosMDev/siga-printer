@@ -1,6 +1,6 @@
 {
   "name": "siga-printer",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Full-featured ESC/POS thermal printer library for React Native. Supports Epson TM-T20X II and compatibles via USB, Serial, Bluetooth and TCP/IP.",
   "main": "lib/commonjs/index.js",
   "module": "lib/module/index.js",

@@ -77,10 +77,24 @@ export interface PrinterProfile {
   supportsNativeBarcode: boolean;
   /** Supports image printing (GS v 0) */
   supportsImage: boolean;
-  /** Supports landscape/rotated printing */
+  /** Supports ESC V character rotation (column-by-column) */
   supportsRotation: boolean;
   /** Max dots per line */
   dotsPerLine: number;
+  /**
+   * Supports ESC/POS Page Mode (ESC L / ESC T / FF).
+   * When true, landscape printing uses Page Mode commands instead of
+   * full-page bitmap rasterization — much faster and native-quality.
+   * All Epson TM-series printers support Page Mode.
+   * Many generic 58mm printers do not.
+   */
+  supportsPageMode: boolean;
+  /**
+   * Maximum printable length in page mode (dots along feed direction).
+   * TM-T20X II = 1662 dots (~82mm at 203 DPI).
+   * Defaults to 1662 when omitted.
+   */
+  maxPageLength?: number;
 }
 
 // ── Print orientation ─────────────────────────────────────────

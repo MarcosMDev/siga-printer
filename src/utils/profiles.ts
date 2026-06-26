@@ -18,6 +18,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: false,
     dotsPerLine: 576,
+    supportsPageMode: true,
+    maxPageLength: 1662,
   },
 
   EPSON_TM_T20II: {
@@ -29,6 +31,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: false,
     dotsPerLine: 576,
+    supportsPageMode: true,
+    maxPageLength: 1662,
   },
 
   // TM-T20X II — primary target
@@ -39,10 +43,12 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsNativeQR: true,
     supportsNativeBarcode: true,
     supportsImage: true,
-    // The TM-T20X does NOT have native landscape/rotation ESC command,
-    // so landscape is achieved by rasterizing the content rotated 90°
     supportsRotation: false,
     dotsPerLine: 576,
+    // Page Mode (ESC L / ESC T / FF) is supported by all Epson TM series.
+    // Used for landscape — much faster and higher quality than bitmap rotation.
+    supportsPageMode: true,
+    maxPageLength: 1662,
   },
 
   EPSON_TM_T88: {
@@ -54,6 +60,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: true,
     dotsPerLine: 576,
+    supportsPageMode: true,
+    maxPageLength: 1662,
   },
 
   EPSON_TM_T82: {
@@ -65,6 +73,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: false,
     dotsPerLine: 576,
+    supportsPageMode: true,
+    maxPageLength: 1662,
   },
 
   GENERIC_58MM: {
@@ -76,6 +86,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: false,
     dotsPerLine: 384,
+    // Most generic 58mm thermal printers lack Page Mode support
+    supportsPageMode: false,
   },
 
   GENERIC_80MM: {
@@ -87,6 +99,8 @@ export const PRINTER_PROFILES: Record<PrinterModel, PrinterProfile> = {
     supportsImage: true,
     supportsRotation: false,
     dotsPerLine: 576,
+    // Unknown — default to false; override with a custom profile if needed
+    supportsPageMode: false,
   },
 };
 
