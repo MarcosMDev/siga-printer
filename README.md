@@ -292,16 +292,29 @@ Inject raw ESC/POS bytes for commands not covered by the API.
 // Portrait (default)
 const printer = await ThermalPrinter.connect(config, { orientation: 'portrait' });
 
-// Landscape — content rotated 90°, useful for wide barcodes
+// Landscape — ALL content rotated 90° (text, barcodes, QR, dividers, rows)
 const printer = await ThermalPrinter.connect(config, { orientation: 'landscape' });
 
 // Switch during a job
 printer.setOrientation('landscape');
+
+// Or via printerManager.getPrinter()
+const printer = printerManager.getPrinter({ orientation: 'landscape' });
 ```
 
-> **TM-T20X II note:** This model does not support ESC V (native rotation).
-> Landscape is implemented by rasterizing content as a rotated bitmap.
-> The output is visually identical but requires slightly more processing.
+**How it works — two paths, chosen automatically by printer profile:**
+
+| Printer | Method | Quality | Data sent |
+|---|---|---|---|
+| Epson TM series | ESC/POS **Page Mode** (`ESC L` / `ESC T 1` / `FF`) | Native 203 DPI font + barcode | ~500 bytes |
+| Generic (no Page Mode) | Android Canvas bitmap → rotate 90° → `GS v 0` | Rasterized | 50–400 KB |
+
+For Epson TM-T20X II (default profile), the printer firmware handles all rotation natively — no bitmap generation, no extra processing, same speed as portrait.
+
+> **Printer profiles** control which path is used via `supportsPageMode`.
+> All `EPSON_TM_*` profiles have `supportsPageMode: true`.
+> `GENERIC_58MM` / `GENERIC_80MM` default to `false` (bitmap fallback).
+> Override with a custom profile if your generic printer supports page mode.
 
 ---
 
@@ -838,16 +851,29 @@ Injeta bytes ESC/POS arbitrários para comandos não cobertos pela API.
 // Retrato (padrão)
 const printer = await ThermalPrinter.connect(config, { orientation: 'portrait' });
 
-// Paisagem — conteúdo rotacionado 90°, útil para códigos de barras largos
+// Paisagem — TODO conteúdo rotacionado 90° (texto, código de barras, QR, divisores, linhas)
 const printer = await ThermalPrinter.connect(config, { orientation: 'landscape' });
 
 // Trocar durante o job
 printer.setOrientation('landscape');
+
+// Ou via printerManager.getPrinter()
+const printer = printerManager.getPrinter({ orientation: 'landscape' });
 ```
 
-> **Nota TM-T20X II:** Este modelo não suporta o comando ESC V (rotação nativa).
-> A orientação paisagem é implementada rasterizando o conteúdo como bitmap rotacionado 90°.
-> O resultado é idêntico visualmente, porém requer um pouco mais de processamento.
+**Como funciona — dois caminhos, escolhidos automaticamente pelo perfil:**
+
+| Impressora | Método | Qualidade | Dados enviados |
+|---|---|---|---|
+| Epson TM series | ESC/POS **Page Mode** (`ESC L` / `ESC T 1` / `FF`) | Fonte nativa 203 DPI + barcode | ~500 bytes |
+| Genérica (sem Page Mode) | Android Canvas bitmap → rotaciona 90° → `GS v 0` | Rasterizado | 50–400 KB |
+
+Para a Epson TM-T20X II (perfil padrão), o firmware da impressora rotaciona tudo nativamente — sem geração de bitmap, sem processamento extra, mesma velocidade do modo retrato.
+
+> Os **perfis de impressora** controlam qual caminho é usado via `supportsPageMode`.
+> Todos os perfis `EPSON_TM_*` têm `supportsPageMode: true`.
+> `GENERIC_58MM` / `GENERIC_80MM` usam `false` por padrão (fallback bitmap).
+> Crie um perfil customizado se sua impressora genérica suportar page mode.
 
 ---
 
